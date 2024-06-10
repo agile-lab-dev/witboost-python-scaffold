@@ -92,8 +92,7 @@ linter:
     - cd specific-provisioner
     - poetry install
   script:
-    - poetry run ruff .
-    - poetry run black .
+    - poetry run ruff check .
 
 helm_test:
   stage: test

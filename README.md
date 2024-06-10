@@ -35,7 +35,7 @@ This microservice is written in Python 3.11, using FastAPI for the HTTP layer. P
 
 **Requirements:**
 
-- Python 3.11
+- Python 3.11.x (this is a **strict** requirement as of now, due to uvloop 0.17.0)
 - Poetry
 
 **Installing**:
@@ -55,12 +55,13 @@ poetry --version
 If you see something like `Poetry (version x.x.x)`, your install is ready to use!
 
 Install the dependencies defined in `specific-provisioner/pyproject.toml`:
+
 ```
 cd specific-provisioner
 poetry install
 ```
 
-*Note:* All the following commands are to be run in the Poetry project directory with the virtualenv enabled.
+_Note:_ All the following commands are to be run in the Poetry project directory with the virtualenv enabled. If you use _pyenv_ to manage multiple Python runtimes, make sure Poetry is using the right version. You can tell _pyenv_ to use the Python version available in the current shell. Check this Poetry docs page [here](https://python-poetry.org/docs/managing-environments/).
 
 **Type check:** is handled by mypy:
 
@@ -88,7 +89,7 @@ docker build .
 
 More details can be found [here](specific-provisioner/docs/docker.md).
 
-*Note:* the version for the project is automatically computed using information gathered from Git, using branch name and tags. Unless you are on a release branch `1.2.x` or a tag `v1.2.3` it will end up being `0.0.0`. You can follow this branch/tag convention or update the version computation to match your preferred strategy.
+_Note:_ the version for the project is automatically computed using information gathered from Git, using branch name and tags. Unless you are on a release branch `1.2.x` or a tag `v1.2.3` it will end up being `0.0.0`. You can follow this branch/tag convention or update the version computation to match your preferred strategy.
 
 **CI/CD:** the pipeline is based on GitLab CI as that's what we use internally. It's configured by the `.gitlab-ci.yaml` file in the root of the repository. You can use that as a starting point for your customizations.
 
@@ -125,6 +126,7 @@ Agile Lab creates value for its Clients in data-intensive environments through c
 Since 2014 we have implemented 100+ successful Elite Data Engineering initiatives and used that experience to create Witboost: a technology agnostic, modular platform, that empowers modern enterprises to discover, elevate and productize their data both in traditional environments and on fully compliant Data mesh architectures.
 
 [Contact us](https://www.agilelab.it/contacts) or follow us on:
+
 - [LinkedIn](https://www.linkedin.com/company/agile-lab/)
 - [Instagram](https://www.instagram.com/agilelab_official/)
 - [YouTube](https://www.youtube.com/channel/UCTWdhr7_4JmZIpZFhMdLzAA)
