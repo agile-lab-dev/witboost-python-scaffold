@@ -9,7 +9,7 @@ from src.utility.logger import get_logger
 logger = get_logger()
 
 
-T = TypeVar('T', bound=BaseModel)
+T = TypeVar("T", bound=BaseModel)
 
 
 def parse_yaml_with_model(yaml_data: dict | str, model: Type[T]) -> T | ValidationError:

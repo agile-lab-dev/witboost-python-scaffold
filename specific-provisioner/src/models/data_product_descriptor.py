@@ -1,16 +1,21 @@
 from datetime import datetime
 from enum import StrEnum
-from typing import List, Literal, Optional
+from typing import Annotated, List, Literal, Optional, Type
 
 from pydantic import (
     AnyUrl,
     BaseModel,
+    BeforeValidator,
+    ConfigDict,
     Field,
     field_validator,
     model_validator,
 )
 
 from src.models.constants import OPENMETADATA_SUPPORTED_DATATYPES
+from src.utility.logger import get_logger
+
+logger = get_logger(__name__)
 
 
 class ComponentKind(StrEnum):
@@ -105,15 +110,20 @@ class InputWorkload(BaseModel):
 
 
 class Component(BaseModel):
+    model_config = ConfigDict(extra="allow")
+    kind: ComponentKind
+
     id: str
     name: str
     fullyQualifiedName: Optional[str] = None
     description: str
     specific: dict
-    kind: ComponentKind
 
 
 class OutputPort(Component):
+    model_config = ConfigDict(extra="allow")
+    kind: Literal[ComponentKind.OUTPUTPORT]
+
     version: str
     infrastructureTemplateId: str
     useCaseTemplateId: Optional[str] = None
@@ -134,7 +144,7 @@ class OutputPort(Component):
     @field_validator("kind")
     @classmethod
     def check_kind(cls, value, values):
-        if value == "outputport":
+        if value == ComponentKind.OUTPUTPORT:
             return value
         else:
             raise ValueError(
@@ -143,6 +153,9 @@ class OutputPort(Component):
 
 
 class Workload(Component):
+    model_config = ConfigDict(extra="allow")
+    kind: Literal[ComponentKind.WORKLOAD]
+
     version: str
     infrastructureTemplateId: str
     useCaseTemplateId: Optional[str] = None
@@ -168,7 +181,6 @@ class Workload(Component):
             raise ValueError(
                 "readsFrom is only allowed when connectionType is 'DATAPIPELINE'"  # noqa: E501
             )
-            return None
 
         # Output Ports are identified with DP_UK:$OutputPortName,
         # while external systems will be defined by a URN in the form urn:dmb:ex:$SystemName    # noqa: E501
@@ -191,7 +203,7 @@ class Workload(Component):
     @field_validator("kind")
     @classmethod
     def check_kind(cls, value, values):
-        if value == "workload":
+        if value == ComponentKind.WORKLOAD:
             return value
         else:
             raise ValueError(
@@ -200,7 +212,9 @@ class Workload(Component):
 
 
 class StorageArea(Component):
-    owners: List[str]
+    model_config = ConfigDict(extra="allow")
+    kind: Literal[ComponentKind.STORAGE]
+
     infrastructureTemplateId: str
     useCaseTemplateId: Optional[str] = None
     dependsOn: List[str]
@@ -212,7 +226,7 @@ class StorageArea(Component):
     @field_validator("kind")
     @classmethod
     def check_kind(cls, value, values):
-        if value == "storage":
+        if value == ComponentKind.STORAGE:
             return value
         else:
             raise ValueError(
@@ -221,7 +235,9 @@ class StorageArea(Component):
 
 
 class Observability(Component):
-    kind: ComponentKind
+    model_config = ConfigDict(extra="allow")
+    kind: Literal[ComponentKind.OBSERVABILITY]
+
     endpoint: AnyUrl
     completeness: dict
     dataProfiling: dict
@@ -232,12 +248,34 @@ class Observability(Component):
     @field_validator("kind")
     @classmethod
     def check_kind(cls, value, values):
-        if value == "observability":
+        if value == ComponentKind.OBSERVABILITY:
             return value
         else:
             raise ValueError(
                 f"kind of component with id {values.get('id')} must be 'observability'"  # noqa: E501
             )
+
+
+component_map: dict[str, Type[Component]] = {
+    ComponentKind.OBSERVABILITY: Observability,
+    ComponentKind.OUTPUTPORT: OutputPort,
+    ComponentKind.WORKLOAD: Workload,
+    ComponentKind.STORAGE: StorageArea,
+}
+
+
+def parse_component(data: dict | Component) -> Component:
+    if isinstance(data, Component):  # happens if DP is created in code
+        if data.kind not in component_map:
+            raise ValueError(f"Unknown component kind: {data.kind}")
+        return data
+    else:
+        kind = data.get("kind")
+        if kind not in component_map:
+            raise ValueError(f"Unknown component kind: {kind}")
+        component = component_map[kind](**data)
+        logger.debug("Parsed component: " + str(component))
+        return component
 
 
 class DataProduct(BaseModel):
@@ -260,7 +298,7 @@ class DataProduct(BaseModel):
     billing: Optional[dict] = None
     tags: List[OpenMetadataTagLabel]
     specific: dict
-    components: List[Component]
+    components: List[Annotated[Component, BeforeValidator(parse_component)]]
 
     def get_components_by_kind(self, kind: str) -> List[Component]:
         """
@@ -311,6 +349,15 @@ class DataProduct(BaseModel):
             if component.id == component_id:
                 return component
         return None
+
+    def get_typed_component_by_id(
+        self, component_id: str, component_type: Type[BaseModel]
+    ):
+        component = self.get_component_by_id(component_id)
+        if component is not None:
+            return component_type.parse_obj(component.dict(by_alias=True))
+        else:
+            return None
 
     def get_output_ports(self) -> List[OutputPort]:
         """

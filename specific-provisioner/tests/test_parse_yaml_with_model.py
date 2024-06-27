@@ -1,4 +1,5 @@
 import unittest
+from pathlib import Path
 
 from pydantic import BaseModel
 
@@ -83,55 +84,18 @@ class TestParseYAMLWithModel(unittest.TestCase):
         self.assertIsInstance(result_sub_b_invalid, ValidationError)
 
 
-sample_data_product_yaml = """
-id: data_product_123
-name: My Data Product
-description: This is a sample Data Product for testing purposes.
-kind: dataproduct
-domain: example.com
-version: '1.0'
-environment: production
-dataProductOwner: John Doe
-ownerGroup: data_product_owners
-devGroup: data_product_devs
-tags:
-  - tagFQN: data_product_tag1
-  - tagFQN: data_product_tag2
-specific:
-  customField1: Value1
-  customField2: Value2
-components:
-  - id: component1
-    name: Component 1
-    description: This is the first component.
-    kind: outputport
-    version: '1.0'
-    infrastructureTemplateId: infrastructure_template_1
-    specific:
-      outputPortSpecificField1: OutputPortValue1
-      outputPortSpecificField2: OutputPortValue2
-  - id: component2
-    name: Component 2
-    description: This is the second component.
-    kind: outputport
-    version: '1.0'
-    infrastructureTemplateId: infrastructure_template_2
-    specific:
-      outputPortSpecificField1: val3
-      outputPortSpecificField2: val4
-"""
-
-
 def test_parse_valid_data_product_yaml():
-    result = parse_yaml_with_model(sample_data_product_yaml, DataProduct)
+    descriptor_str = Path("tests/descriptors/data_product_valid.yaml").read_text()
+    result = parse_yaml_with_model(descriptor_str, DataProduct)
     assert not isinstance(result, ValidationError)
     assert isinstance(result, DataProduct)
 
 
 def test_parse_invalid_data_product_yaml():
+    descriptor_str = Path("tests/descriptors/data_product_valid.yaml").read_text()
     # Modify the YAML data to make it invalid
-    invalid_yaml_data = sample_data_product_yaml.replace(
-        "name: My Data Product", "invalid_field: Invalid Value"
+    invalid_yaml_data = descriptor_str.replace(
+        "name: Vaccinations", "invalid_field: Invalid Value"
     )
 
     result = parse_yaml_with_model(invalid_yaml_data, DataProduct)

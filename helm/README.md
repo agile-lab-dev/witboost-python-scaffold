@@ -15,6 +15,7 @@ A Helm chart for Kubernetes
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | dockerRegistrySecretName | string | `"regcred"` | Docker Registry Secret name used to access a private repo |
+| extraEnvVars | list | `[]` | define extra variables to add to the container(s) e.g: extraEnvVars:   - name: FOO     value: "10" |
 | image.pullPolicy | string | `"Always"` | The imagePullPolicy for a container and the tag of the image affect when the kubelet attempts to pull (download) the specified image. |
 | image.registry | string | `"registry.gitlab.com/agilefactory/witboost.mesh/provisioning/witboost.mesh.provisioning.pythonspecificprovisioner"` | Image repository |
 | image.tag | string | `"latest"` | Image tag |

@@ -1,5 +1,7 @@
 import unittest
+from pathlib import Path
 
+import pydantic_core
 import pytest
 import yaml
 
@@ -138,7 +140,7 @@ class TestDataProductDescriptor(unittest.TestCase):
 
     def test_get_components_by_kind_observability(self):
         observability_apis = self.sample_data_product.get_components_by_kind(
-            ComponentKind.OBSERVABILITY.value
+            ComponentKind.OBSERVABILITY
         )
         self.assertEqual(1, len(observability_apis))
         self.assertIsInstance(observability_apis[0], Observability)
@@ -466,3 +468,19 @@ class TestDataProductDescriptor(unittest.TestCase):
             "readsFrom is only allowed when connectionType is 'DATAPIPELINE'",
             result.errors[0],
         )
+
+    def test_get_typed_component_output_port(self):
+        descriptor_str = Path("tests/descriptors/descriptor_output_port_valid.yaml").read_text()
+        request = yaml.safe_load(descriptor_str)
+        data_product = parse_yaml_with_model(request.get("dataProduct"), DataProduct)
+        component_to_provision = request.get("componentIdToProvision")
+
+        assert data_product.get_typed_component_by_id(component_to_provision, OutputPort) is not None
+
+        descriptor_str = Path("tests/descriptors/descriptor_storage_valid.yaml").read_text()
+        request = yaml.safe_load(descriptor_str)
+        data_product = parse_yaml_with_model(request.get("dataProduct"), DataProduct)
+        invalid_component_to_provision = request.get("componentIdToProvision")
+
+        with pytest.raises(pydantic_core.ValidationError, match="5 validation errors for OutputPort"):
+            data_product.get_typed_component_by_id(invalid_component_to_provision, OutputPort)

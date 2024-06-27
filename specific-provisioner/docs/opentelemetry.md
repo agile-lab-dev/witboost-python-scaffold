@@ -23,10 +23,11 @@ Here’s an explanation of what each environment variables does:
 - `OTEL_METRICS_EXPORTER` specifies which metrics exporter to use. In this case, metrics are being exported to `console` (stdout).
 - `OTEL_EXPORTER_OTLP_TRACES_ENDPOINT` sets the endpoint where telemetry is exported to. If omitted, the default `Collector` endpoint will be used, which is `0.0.0.0:4317` for gRPC and `0.0.0.0:4318` for HTTP.
 
-#### Setup SigNoz as osservability backend
+#### Setup SigNoz as observability backend
+
 One of the biggest advantages of using OpenTelemetry is that it is vendor-agnostic. It can export data in multiple formats which you can send to a backend of your choice.
 
-As osservability backend we will refer to [SigNoz](https://signoz.io/). SigNoz is an open-source APM tool that can be used for both metrics and distributed tracing.
+As observability backend we will refer to [SigNoz](https://signoz.io/). SigNoz is an open-source APM tool that can be used for both metrics and distributed tracing.
 
 ##### 1. Installation using Docker Compose
 > **Note**

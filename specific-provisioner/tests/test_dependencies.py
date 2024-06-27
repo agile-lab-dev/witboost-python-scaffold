@@ -1,4 +1,5 @@
 import unittest
+from pathlib import Path
 from unittest.mock import Mock
 
 from fastapi import FastAPI
@@ -20,49 +21,11 @@ from src.models.data_product_descriptor import DataProduct
 
 
 class TestUnpackUpdateAclRequest(unittest.TestCase):
+    descriptor_str = Path("tests/descriptors/descriptor_output_port_valid.yaml").read_text()
     update_acl_request = UpdateAclRequest(
         refs=["user:testuser", "bigData"],
         provisionInfo=ProvisionInfo(
-            request="""
-            dataProduct:
-              id: data_product_123
-              name: My Data Product
-              description: This is a sample Data Product for testing purposes.
-              kind: dataproduct
-              domain: example.com
-              version: '1.0'
-              environment: production
-              dataProductOwner: John Doe
-              ownerGroup: data_product_owners
-              devGroup: data_product_devs
-              tags:
-              - tagFQN: data_product_tag1
-              - tagFQN: data_product_tag2
-              specific:
-                customField1: Value1
-                customField2: Value2
-              components:
-              - id: component1
-                name: Component 1
-                description: This is the first component.
-                kind: outputport
-                version: '1.0'
-                infrastructureTemplateId: infrastructure_template_1
-                specific:
-                  outputPortSpecificField1: OutputPortValue1
-                  outputPortSpecificField2: OutputPortValue2
-              - id: component2
-                name: Component 2
-                description: This is the second component.
-                kind: outputport
-                version: '1.0'
-                infrastructureTemplateId: infrastructure_template_2
-                specific:
-                  outputPortSpecificField1: val3
-                  outputPortSpecificField2: val4
-            componentIdToProvision: id123
-
-            """,  # noqa: E501
+            request=descriptor_str,  # noqa: E501
             result="result_prov",
         ),
     )
@@ -78,7 +41,7 @@ class TestUnpackUpdateAclRequest(unittest.TestCase):
     async def test_invalid_request(self):
         # Create a mock UpdateAclRequest instance with an invalid request
         update_acl_request = Mock()
-        update_acl_request.provisionInfo.request = 'Invalid JSON'
+        update_acl_request.provisionInfo.request = "Invalid JSON"
 
         # Call the function and assert the result
         result = unpack_update_acl_request(update_acl_request)
@@ -87,97 +50,25 @@ class TestUnpackUpdateAclRequest(unittest.TestCase):
 
     async def test_exception_handling(self):
         update_acl_request = Mock()
-        update_acl_request.provisionInfo.request = '{}'
+        update_acl_request.provisionInfo.request = "{}"
 
         result = unpack_update_acl_request(update_acl_request)
         self.assertIsInstance(result, ValidationError)
 
 
 class TestUnpackProvisioningRequest(unittest.TestCase):
+    descriptor_str = Path("tests/descriptors/descriptor_output_port_valid.yaml").read_text()
     provisioning_request = ProvisioningRequest(
         descriptorKind="COMPONENT_DESCRIPTOR",
-        descriptor="""
-                dataProduct:
-                  id: data_product_123
-                  name: My Data Product
-                  description: This is a sample Data Product for testing purposes.
-                  kind: dataproduct
-                  domain: example.com
-                  version: '1.0'
-                  environment: production
-                  dataProductOwner: John Doe
-                  ownerGroup: data_product_owners
-                  devGroup: data_product_devs
-                  tags:
-                  - tagFQN: data_product_tag1
-                  - tagFQN: data_product_tag2
-                  specific:
-                    customField1: Value1
-                    customField2: Value2
-                  components:
-                  - id: component1
-                    name: Component 1
-                    description: This is the first component.
-                    kind: outputport
-                    version: '1.0'
-                    infrastructureTemplateId: infrastructure_template_1
-                    specific:
-                      outputPortSpecificField1: OutputPortValue1
-                      outputPortSpecificField2: OutputPortValue2
-                  - id: component2
-                    name: Component 2
-                    description: This is the second component.
-                    kind: outputport
-                    version: '1.0'
-                    infrastructureTemplateId: infrastructure_template_2
-                    specific:
-                      outputPortSpecificField1: val3
-                      outputPortSpecificField2: val4
-                componentIdToProvision: id123
-        """,  # noqa: E501
+        descriptor=descriptor_str,  # noqa: E501
     )
 
     invalid_provisioning_request = ProvisioningRequest(
         # dropped the 'name' field from the previous provisioning_request
         descriptorKind="COMPONENT_DESCRIPTOR",
-        descriptor="""
-        dataProduct:
-          id: data_product_123
-          description: This is a sample Data Product for testing purposes.
-          kind: dataproduct
-          domain: example.com
-          version: '1.0'
-          environment: production
-          dataProductOwner: John Doe
-          ownerGroup: data_product_owners
-          devGroup: data_product_devs
-          tags:
-          - tagFQN: data_product_tag1
-          - tagFQN: data_product_tag2
-          specific:
-            customField1: Value1
-            customField2: Value2
-          components:
-          - id: component1
-            name: Component 1
-            description: This is the first component.
-            kind: outputport
-            version: '1.0'
-            infrastructureTemplateId: infrastructure_template_1
-            specific:
-              outputPortSpecificField1: OutputPortValue1
-              outputPortSpecificField2: OutputPortValue2
-          - id: component2
-            name: Component 2
-            description: This is the second component.
-            kind: outputport
-            version: '1.0'
-            infrastructureTemplateId: infrastructure_template_2
-            specific:
-              outputPortSpecificField1: val3
-              outputPortSpecificField2: val4
-        componentIdToProvision: id123
-        """,  # noqa: E501
+        descriptor=descriptor_str.replace(
+            "name: Vaccinations", "invalid_field: Invalid Value"
+        ),  # noqa: E501
     )
 
     async def test_successful_unpack(self):
@@ -195,7 +86,7 @@ class TestUnpackProvisioningRequest(unittest.TestCase):
     async def test_exception_handling(self):
         provisioning_request = Mock()
         provisioning_request.descriptorKind = "COMPONENT_DESCRIPTOR"
-        provisioning_request.descriptor = 'Invalid JSON'
+        provisioning_request.descriptor = "Invalid JSON"
 
         result = unpack_provisioning_request(provisioning_request)
         self.assertIsInstance(result, ValidationError)
@@ -235,47 +126,10 @@ client = TestClient(app_test)
 
 class TestAppDependenciesMock(unittest.TestCase):
     def test_provision_valid_request(self):
+        descriptor_str = Path("tests/descriptors/descriptor_output_port_valid.yaml").read_text()
         valid_provisioning_request = ProvisioningRequest(
             descriptorKind="COMPONENT_DESCRIPTOR",
-            descriptor="""
-            dataProduct:
-              id: data_product_123
-              name: My Data Product
-              description: This is a sample Data Product for testing purposes.
-              kind: dataproduct
-              domain: example.com
-              version: '1.0'
-              environment: production
-              dataProductOwner: John Doe
-              ownerGroup: data_product_owners
-              devGroup: data_product_devs
-              tags:
-              - tagFQN: data_product_tag1
-              - tagFQN: data_product_tag2
-              specific:
-                customField1: Value1
-                customField2: Value2
-              components:
-              - id: component1
-                name: Component 1
-                description: This is the first component.
-                kind: outputport
-                version: '1.0'
-                infrastructureTemplateId: infrastructure_template_1
-                specific:
-                  outputPortSpecificField1: OutputPortValue1
-                  outputPortSpecificField2: OutputPortValue2
-              - id: component2
-                name: Component 2
-                description: This is the second component.
-                kind: outputport
-                version: '1.0'
-                infrastructureTemplateId: infrastructure_template_2
-                specific:
-                  outputPortSpecificField1: val3
-                  outputPortSpecificField2: val4
-            componentIdToProvision: id123
-            """,  # noqa: E501
+            descriptor=descriptor_str,  # noqa: E501
         )
 
         response = client.post(
@@ -301,49 +155,11 @@ class TestAppDependenciesMock(unittest.TestCase):
         assert "errors" in response.json()
 
     def test_updateacl_valid_request(self):
+        descriptor_str = Path("tests/descriptors/descriptor_output_port_valid.yaml").read_text()
         valid_update_acl_request = UpdateAclRequest(
             refs=["user:testuser", "bigData"],
             provisionInfo=ProvisionInfo(
-                request="""
-                dataProduct:
-                  id: data_product_123
-                  name: My Data Product
-                  description: This is a sample Data Product for testing purposes.
-                  kind: dataproduct
-                  domain: example.com
-                  version: '1.0'
-                  environment: production
-                  dataProductOwner: John Doe
-                  ownerGroup: data_product_owners
-                  devGroup: data_product_devs
-                  tags:
-                  - tagFQN: data_product_tag1
-                  - tagFQN: data_product_tag2
-                  specific:
-                    customField1: Value1
-                    customField2: Value2
-                  components:
-                  - id: component1
-                    name: Component 1
-                    description: This is the first component.
-                    kind: outputport
-                    version: '1.0'
-                    infrastructureTemplateId: infrastructure_template_1
-                    specific:
-                      outputPortSpecificField1: OutputPortValue1
-                      outputPortSpecificField2: OutputPortValue2
-                  - id: component2
-                    name: Component 2
-                    description: This is the second component.
-                    kind: outputport
-                    version: '1.0'
-                    infrastructureTemplateId: infrastructure_template_2
-                    specific:
-                      outputPortSpecificField1: val3
-                      outputPortSpecificField2: val4
-                componentIdToProvision: id123
-
-                """,  # noqa: E501
+                request=descriptor_str,  # noqa: E501
                 result="result_prov",
             ),
         )

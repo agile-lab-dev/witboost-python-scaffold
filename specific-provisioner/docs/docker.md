@@ -15,7 +15,7 @@ To enable automatic instrumentation, you can pass the parameter `open_telemetry_
 docker run -d --name python-sp-container -p 5002:5002 python-specific-provisioner open_telemetry_activation
 ```
 
-You need to set some `environment variables` while running the application with OpenTelemetry and send collected data to an `Osservability backend`. Referring to [SignOz](./opentelemetry.md), you can do so with the following commands at the terminal:
+You need to set some `environment variables` while running the application with OpenTelemetry and send collected data to an `Observability backend`. Referring to [SignOz](./opentelemetry.md), you can do so with the following commands at the terminal:
 ```
 # If you have your SigNoz IP Address, replace <IP of SigNoz> with your IP Address.
 

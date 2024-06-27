@@ -4,9 +4,9 @@
     </a>
 </p>
 
-Designed by [Agile Lab](https://www.agilelab.it/), witboost is a versatile platform that addresses a wide range of sophisticated data engineering challenges. It enables businesses to discover, enhance, and productize their data, fostering the creation of automated data platforms that adhere to the highest standards of data governance. Want to know more about witboost? Check it out [here](https://www.agilelab.it/witboost) or [contact us!](https://www.agilelab.it/contacts)
+Designed by [Agile Lab](https://www.agilelab.it/), Witboost is a versatile platform that addresses a wide range of sophisticated data engineering challenges. It enables businesses to discover, enhance, and productize their data, fostering the creation of automated data platforms that adhere to the highest standards of data governance. Want to know more about Witboost? Check it out [here](https://www.agilelab.it/witboost) or [contact us!](https://www.agilelab.it/contacts)
 
-This repository is part of our [Starter Kit](https://github.com/agile-lab-dev/witboost-starter-kit) meant to showcase witboost's integration capabilities and provide a "batteries-included" product.
+This repository is part of our [Starter Kit](https://github.com/agile-lab-dev/witboost-starter-kit) meant to showcase Witboost integration capabilities and provide a "batteries-included" product.
 
 # Python Scaffold
 
@@ -35,7 +35,7 @@ This microservice is written in Python 3.11, using FastAPI for the HTTP layer. P
 
 **Requirements:**
 
-- Python 3.11.x (this is a **strict** requirement as of now, due to uvloop 0.17.0)
+- Python ~3.11.9 (this is a **strict** requirement as of now, due to uvloop 0.17.0)
 - Poetry
 
 **Installing**:
@@ -52,7 +52,7 @@ Once Poetry is installed and in your `$PATH`, you can execute the following:
 poetry --version
 ```
 
-If you see something like `Poetry (version x.x.x)`, your install is ready to use!
+If you see something like `Poetry (version x.x.x)`, your installation is ready to use!
 
 Install the dependencies defined in `specific-provisioner/pyproject.toml`:
 
