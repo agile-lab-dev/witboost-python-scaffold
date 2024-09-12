@@ -35,8 +35,28 @@ This microservice is written in Python 3.11, using FastAPI for the HTTP layer. P
 
 **Requirements:**
 
-- Python ~3.11.9 (this is a **strict** requirement as of now, due to uvloop 0.17.0)
+- Python ~3.11 (this is a **strict** requirement as of now, due to uvloop 0.17.0)
 - Poetry
+
+If you don't have any instance of Python 3 installed, you can install Python 3.11 directly executing the following commands:
+
+```shell
+sudo apt update
+sudo apt install software-properties-common
+sudo add-apt-repository ppa:deadsnakes/ppa
+sudo apt update
+sudo apt install python3.11
+python3.11 --version
+which python3.11
+```
+
+If you do have Python 3 installed, but not version 3.11 required by this project, we recommend using _pyenv_ to manage python environments with different versions, as it is flexible and fully compatible with Poetry. You can install _pyenv_ following the guide [here](https://github.com/pyenv/pyenv?tab=readme-ov-file#installation). Then, to install and configure to use Python 3.11 on the project simply execute:
+
+```shell
+pyenv install 3.11
+cd specific-provisioner
+pyenv local 3.11
+```
 
 **Installing**:
 
@@ -56,12 +76,13 @@ If you see something like `Poetry (version x.x.x)`, your installation is ready t
 
 Install the dependencies defined in `specific-provisioner/pyproject.toml`:
 
-```
+```shell
 cd specific-provisioner
+poetry env use 3.11
 poetry install
 ```
 
-_Note:_ All the following commands are to be run in the Poetry project directory with the virtualenv enabled. If you use _pyenv_ to manage multiple Python runtimes, make sure Poetry is using the right version. You can tell _pyenv_ to use the Python version available in the current shell. Check this Poetry docs page [here](https://python-poetry.org/docs/managing-environments/).
+Note: All the following commands are to be run in the Poetry project directory with the virtualenv enabled. If you use _pyenv_ to manage multiple Python runtimes, make sure Poetry is using the right version. You can tell _pyenv_ to use the Python version available in the current shell. Check this Poetry docs page [here](https://python-poetry.org/docs/managing-environments/).
 
 **Type check:** is handled by mypy:
 
