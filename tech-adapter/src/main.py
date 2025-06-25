@@ -57,7 +57,7 @@ async def log_request_response_middleware(request: Request, call_next):
         "400": {"model": ValidationError},
         "500": {"model": SystemErr},
     },
-    tags=["SpecificProvisioner"],
+    tags=["TechAdapter"],
 )
 def provision(request: UnpackedProvisioningRequestDep) -> Response:
     """
@@ -89,7 +89,7 @@ def provision(request: UnpackedProvisioningRequestDep) -> Response:
         "400": {"model": ValidationError},
         "500": {"model": SystemErr},
     },
-    tags=["SpecificProvisioner"],
+    tags=["TechAdapter"],
 )
 def get_status(token: str) -> Response:
     """
@@ -111,7 +111,7 @@ def get_status(token: str) -> Response:
         "400": {"model": ValidationError},
         "500": {"model": SystemErr},
     },
-    tags=["SpecificProvisioner"],
+    tags=["TechAdapter"],
 )
 def unprovision(request: UnpackedUnprovisioningRequestDep) -> Response:
     """
@@ -145,7 +145,7 @@ def unprovision(request: UnpackedUnprovisioningRequestDep) -> Response:
         "400": {"model": ValidationError},
         "500": {"model": SystemErr},
     },
-    tags=["SpecificProvisioner"],
+    tags=["TechAdapter"],
 )
 def updateacl(request: UnpackedUpdateAclRequestDep) -> Response:
     """
@@ -171,7 +171,7 @@ def updateacl(request: UnpackedUpdateAclRequestDep) -> Response:
     "/v1/validate",
     response_model=None,
     responses={"200": {"model": ValidationResult}, "500": {"model": SystemErr}},
-    tags=["SpecificProvisioner"],
+    tags=["TechAdapter"],
 )
 def validate(request: UnpackedProvisioningRequestDep) -> Response:
     """
@@ -201,7 +201,7 @@ def validate(request: UnpackedProvisioningRequestDep) -> Response:
         "400": {"model": ValidationError},
         "500": {"model": SystemErr},
     },
-    tags=["SpecificProvisioner"],
+    tags=["TechAdapter"],
 )
 def async_validate(
     body: ValidationRequest,
@@ -228,7 +228,7 @@ def async_validate(
         "400": {"model": ValidationError},
         "500": {"model": SystemErr},
     },
-    tags=["SpecificProvisioner"],
+    tags=["TechAdapter"],
 )
 def get_validation_status(
     token: str,

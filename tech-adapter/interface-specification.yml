@@ -3,16 +3,14 @@ info:
   title: Tech Adapter Micro Service
   description: "Microservice responsible to handle provisioning and access control requests for one or more data product components."
   version: "{{version}}"
-servers:
-  - url: /datamesh.specificprovisioner
 tags:
-  - name: SpecificProvisioner
+  - name: TechAdapter
     description: All the provisioning related operations
 paths:
   /v2/validate:
     post:
       tags:
-        - SpecificProvisioner
+        - TechAdapter
       summary: Validate a deployment request
       operationId: asyncValidate
       requestBody:
@@ -52,7 +50,7 @@ paths:
   /v2/validate/{token}/status:
     get:
       tags:
-        - SpecificProvisioner
+        - TechAdapter
       summary: Get the status for a provisioning request
       operationId: getValidationStatus
       parameters:
@@ -84,7 +82,7 @@ paths:
   /v1/provision:
     post:
       tags:
-        - SpecificProvisioner
+        - TechAdapter
       summary: Deploy a data product or a single component starting from a provisioning descriptor
       operationId: provision
       requestBody:
@@ -122,7 +120,7 @@ paths:
   /v1/provision/{token}/status:
     get:
       tags:
-        - SpecificProvisioner
+        - TechAdapter
       summary: Get the status for a provisioning request
       operationId: getStatus
       parameters:
@@ -154,7 +152,7 @@ paths:
   /v1/validate:
     post:
       tags:
-        - SpecificProvisioner
+        - TechAdapter
       summary: Validate a provisioning request
       operationId: validate
       requestBody:
@@ -180,7 +178,7 @@ paths:
   /v1/unprovision:
     post:
       tags:
-        - SpecificProvisioner
+        - TechAdapter
       summary: Undeploy a data product or a single component given the provisioning descriptor relative to the latest complete provisioning request
       operationId: unprovision
       requestBody:
@@ -218,7 +216,7 @@ paths:
   /v1/updateacl:
     post:
       tags:
-        - SpecificProvisioner
+        - TechAdapter
       summary: Request the access to a tech adapter component
       operationId: updateacl
       requestBody:
@@ -299,7 +297,7 @@ components:
         Values:
          * `DATAPRODUCT_DESCRIPTOR` - Complete descriptor of a data product. It is used in the data product level provisioning workflow.
          * `COMPONENT_DESCRIPTOR` - Provisioning descriptor for a single data product component. Includes both the complete data product descriptor (`dataProduct` object field) and the id of the component to be provisioned (`componentIdToProvision` string field).
-         * `DATAPRODUCT_DESCRIPTOR_WITH_RESULTS` - This value is not currently used in the scope of a specific provisioner.
+         * `DATAPRODUCT_DESCRIPTOR_WITH_RESULTS` - This value is not currently used in the scope of a tech adapter.
       enum:
         [
           DATAPRODUCT_DESCRIPTOR,
@@ -361,7 +359,7 @@ components:
           description: "Provisioning descriptor of type `COMPONENT_DESCRIPTOR` (see [DescriptorKind](#/components/schemas/DescriptorKind) schema) in JSON format. It had been used to provision the data product component"
         result:
           type: string
-          description: "Result message (e.g. a provisiong error or a success message returned by the specific provisioner in the [ProvisioningStatus](#/components/schemas/ProvisioningStatus))"
+          description: "Result message (e.g. a provisiong error or a success message returned by the tech adapter in the [ProvisioningStatus](#/components/schemas/ProvisioningStatus))"
     SystemError:
       required:
         - error

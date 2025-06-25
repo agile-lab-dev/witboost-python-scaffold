@@ -1,13 +1,13 @@
 
 <!-- Generator: Widdershins v4.0.1 -->
 
-<h1 id="tech-adapter-micro-service">Specific Provisioner Micro Service</h1>
+<h1 id="tech-adapter-micro-service">Tech Adapter Micro Service</h1>
 
 > Scroll down for code samples, example requests and responses. Select a language for code samples from the tabs above or the mobile navigation menu.
 
 Microservice responsible to handle provisioning and access control requests for one or more data product components.
 
-<h1 id="tech-adapter-micro-service-specificprovisioner">SpecificProvisioner</h1>
+<h1 id="tech-adapter-micro-service-techadapter">TechAdapter</h1>
 
 All the provisioning related operations
 
@@ -851,7 +851,7 @@ print(r.json())
 
 `POST /v1/updateacl`
 
-*Request the access to a specific provisioner component*
+*Request the access to a tech adapter component*
 
 > Body parameter
 
@@ -1010,13 +1010,13 @@ This operation does not require authentication
 Values:
  * `DATAPRODUCT_DESCRIPTOR` - Complete descriptor of a data product. It is used in the data product level provisioning workflow.
  * `COMPONENT_DESCRIPTOR` - Provisioning descriptor for a single data product component. Includes both the complete data product descriptor (`dataProduct` object field) and the id of the component to be provisioned (`componentIdToProvision` string field).
- * `DATAPRODUCT_DESCRIPTOR_WITH_RESULTS` - This value is not currently used in the scope of a specific provisioner.
+ * `DATAPRODUCT_DESCRIPTOR_WITH_RESULTS` - This value is not currently used in the scope of a tech adapter.
 
 ### Properties
 
 |Name|Type|Required|Restrictions|Description|
 |---|---|---|---|---|
-|*anonymous*|string|false|none|Values:<br> * `DATAPRODUCT_DESCRIPTOR` - Complete descriptor of a data product. It is used in the data product level provisioning workflow.<br> * `COMPONENT_DESCRIPTOR` - Provisioning descriptor for a single data product component. Includes both the complete data product descriptor (`dataProduct` object field) and the id of the component to be provisioned (`componentIdToProvision` string field).<br> * `DATAPRODUCT_DESCRIPTOR_WITH_RESULTS` - This value is not currently used in the scope of a specific provisioner.|
+|*anonymous*|string|false|none|Values:<br> * `DATAPRODUCT_DESCRIPTOR` - Complete descriptor of a data product. It is used in the data product level provisioning workflow.<br> * `COMPONENT_DESCRIPTOR` - Provisioning descriptor for a single data product component. Includes both the complete data product descriptor (`dataProduct` object field) and the id of the component to be provisioned (`componentIdToProvision` string field).<br> * `DATAPRODUCT_DESCRIPTOR_WITH_RESULTS` - This value is not currently used in the scope of a tech adapter.|
 
 #### Enumerated Values
 
@@ -1045,7 +1045,7 @@ Values:
 
 |Name|Type|Required|Restrictions|Description|
 |---|---|---|---|---|
-|descriptorKind|[DescriptorKind](#schemadescriptorkind)|true|none|Values:<br> * `DATAPRODUCT_DESCRIPTOR` - Complete descriptor of a data product. It is used in the data product level provisioning workflow.<br> * `COMPONENT_DESCRIPTOR` - Provisioning descriptor for a single data product component. Includes both the complete data product descriptor (`dataProduct` object field) and the id of the component to be provisioned (`componentIdToProvision` string field).<br> * `DATAPRODUCT_DESCRIPTOR_WITH_RESULTS` - This value is not currently used in the scope of a specific provisioner.|
+|descriptorKind|[DescriptorKind](#schemadescriptorkind)|true|none|Values:<br> * `DATAPRODUCT_DESCRIPTOR` - Complete descriptor of a data product. It is used in the data product level provisioning workflow.<br> * `COMPONENT_DESCRIPTOR` - Provisioning descriptor for a single data product component. Includes both the complete data product descriptor (`dataProduct` object field) and the id of the component to be provisioned (`componentIdToProvision` string field).<br> * `DATAPRODUCT_DESCRIPTOR_WITH_RESULTS` - This value is not currently used in the scope of a tech adapter.|
 |descriptor|string|true|none|Descriptor specification in yaml format. Its structure changes according to `descriptorKind`.|
 
 <h2 id="tocS_ProvisioningStatus">ProvisioningStatus</h2>
@@ -1153,7 +1153,7 @@ Information related to the provisioning workflow of a data product component
 |Name|Type|Required|Restrictions|Description|
 |---|---|---|---|---|
 |request|string|true|none|Provisioning descriptor of type `COMPONENT_DESCRIPTOR` (see [DescriptorKind](#/components/schemas/DescriptorKind) schema) in JSON format. It had been used to provision the data product component|
-|result|string|true|none|Result message (e.g. a provisiong error or a success message returned by the specific provisioner in the [ProvisioningStatus](#/components/schemas/ProvisioningStatus))|
+|result|string|true|none|Result message (e.g. a provisiong error or a success message returned by the tech adapter in the [ProvisioningStatus](#/components/schemas/ProvisioningStatus))|
 
 <h2 id="tocS_SystemError">SystemError</h2>
 <!-- backwards compatibility -->
