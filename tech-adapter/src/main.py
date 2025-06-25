@@ -1,5 +1,10 @@
 from __future__ import annotations
 
+import uuid
+
+from fastapi import Request
+from loguru import logger
+from starlette.background import BackgroundTask
 from starlette.responses import Response
 
 from src.app_config import app
@@ -17,9 +22,30 @@ from src.models.api_models import (
     ValidationResult,
     ValidationStatus,
 )
-from src.utility.logger import get_logger
 
-logger = get_logger()
+
+def log_info(req_body, res_code, res_body):
+    id = str(uuid.uuid4())
+    logger.info("[{}] REQUEST: {}", id, req_body.decode("utf-8"))
+    logger.info("[{}] RESPONSE({}): {}", id, res_code, res_body.decode("utf-8"))
+
+
+@app.middleware("http")
+async def log_request_response_middleware(request: Request, call_next):
+    req_body = await request.body()
+    response = await call_next(request)
+    chunks = []
+    async for chunk in response.body_iterator:
+        chunks.append(chunk)
+    res_body = b"".join(chunks)
+    task = BackgroundTask(log_info, req_body, response.status_code, res_body)
+    return Response(
+        content=res_body,
+        status_code=response.status_code,
+        headers=dict(response.headers),
+        media_type=response.media_type,
+        background=task,
+    )
 
 
 @app.post(
@@ -123,7 +149,7 @@ def unprovision(request: UnpackedUnprovisioningRequestDep) -> Response:
 )
 def updateacl(request: UnpackedUpdateAclRequestDep) -> Response:
     """
-    Request the access to a specific provisioner component
+    Request the access to a tech adapter component
     """
 
     if isinstance(request, ValidationError):

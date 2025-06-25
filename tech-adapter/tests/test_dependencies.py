@@ -66,9 +66,7 @@ class TestUnpackProvisioningRequest(unittest.TestCase):
     invalid_provisioning_request = ProvisioningRequest(
         # dropped the 'name' field from the previous provisioning_request
         descriptorKind="COMPONENT_DESCRIPTOR",
-        descriptor=descriptor_str.replace(
-            "name: Vaccinations", "invalid_field: Invalid Value"
-        ),  # noqa: E501
+        descriptor=descriptor_str.replace("name: Vaccinations", "invalid_field: Invalid Value"),  # noqa: E501
     )
 
     async def test_successful_unpack(self):
@@ -132,9 +130,7 @@ class TestAppDependenciesMock(unittest.TestCase):
             descriptor=descriptor_str,  # noqa: E501
         )
 
-        response = client.post(
-            "/provision", json=valid_provisioning_request.model_dump()
-        )
+        response = client.post("/provision", json=valid_provisioning_request.model_dump())
 
         assert response.status_code == 200
         assert "Provisioning completed successfully" in response.json()["message"]
@@ -146,9 +142,7 @@ class TestAppDependenciesMock(unittest.TestCase):
             descriptorKind="COMPONENT_DESCRIPTOR", descriptor="invalid_descriptor"
         )
 
-        response = client.post(
-            "/provision", json=invalid_provisioning_request.model_dump()
-        )
+        response = client.post("/provision", json=invalid_provisioning_request.model_dump())
 
         assert response.status_code == 200
         assert "Provisioning failed" in response.json()["message"]
@@ -180,9 +174,7 @@ class TestAppDependenciesMock(unittest.TestCase):
             ),
         )
 
-        response = client.post(
-            "/updateacl", json=invalid_provisioning_request.model_dump()
-        )
+        response = client.post("/updateacl", json=invalid_provisioning_request.model_dump())
 
         assert response.status_code == 200
         assert "Provisioning failed" in response.json()["message"]

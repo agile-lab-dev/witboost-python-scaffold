@@ -57,9 +57,7 @@ class ErrorMoreInfo(BaseModel):
 
 class RequestValidationError(BaseModel):
     errors: List[str] = Field(..., deprecated=True)
-    userMessage: Optional[str] = Field(
-        default=None, description="User-readable message to be displayed"
-    )
+    userMessage: Optional[str] = Field(default=None, description="User-readable message to be displayed")
     input: Optional[str] = Field(
         default=None,
         description="Optional field to include the file or descriptor that raised the error",
@@ -78,7 +76,7 @@ class ProvisionInfo(BaseModel):
     )
     result: str = Field(
         ...,
-        description="Result message (e.g. a provisiong error or a success message returned by the specific provisioner in the [ProvisioningStatus](#/components/schemas/ProvisioningStatus))",  # noqa: E501
+        description="Result message (e.g. a provisiong error or a success message returned by the tech adapter in the [ProvisioningStatus](#/components/schemas/ProvisioningStatus))",  # noqa: E501
     )
 
 
@@ -92,9 +90,7 @@ class ReverseProvisioningRequest(BaseModel):
         description="Component's use case template id",
         examples=["urn:dmb:utm:op-standard:0.0.0"],
     )
-    environment: str = Field(
-        ..., description="Target environment", examples=["production"]
-    )
+    environment: str = Field(..., description="Target environment", examples=["production"])
     params: Optional[Dict] = Field(
         default=None,
         description="Reverse provisioning input params",

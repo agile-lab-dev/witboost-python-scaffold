@@ -2,6 +2,7 @@ from datetime import datetime
 from enum import StrEnum
 from typing import Annotated, List, Literal, Optional, Type
 
+from loguru import logger
 from pydantic import (
     AnyUrl,
     BaseModel,
@@ -9,13 +10,9 @@ from pydantic import (
     ConfigDict,
     Field,
     field_validator,
-    model_validator,
 )
 
 from src.models.constants import OPENMETADATA_SUPPORTED_DATATYPES
-from src.utility.logger import get_logger
-
-logger = get_logger(__name__)
 
 
 class ComponentKind(StrEnum):
@@ -25,33 +22,43 @@ class ComponentKind(StrEnum):
     OBSERVABILITY = "observability"
 
 
-class TagSourceTagLabel(StrEnum):
-    CLASSIFICATION = "CLASSIFICATION"
-    GLOSSARY = "GLOSSARY"
+class CaseInsensitiveEnum(StrEnum):
+    @classmethod
+    def _missing_(cls, value):
+        value = value.lower()
+        for member in cls:
+            if member.lower() == value:
+                return member
+        return None
 
 
-class LabelTypeTagLabel(StrEnum):
-    MANUAL = "MANUAL"
-    PROPAGATED = "PROPAGATED"
-    AUTOMATED = "AUTOMATED"
-    DERIVED = "DERIVED"
+class TagSourceTagLabel(CaseInsensitiveEnum):
+    CLASSIFICATION = "Classification"
+    GLOSSARY = "Glossary"
 
 
-class StateTagLabel(StrEnum):
-    SUGGESTED = "SUGGESTED"
-    CONFIRMED = "CONFIRMED"
+class LabelTypeTagLabel(CaseInsensitiveEnum):
+    MANUAL = "Manual"
+    PROPAGATED = "Propagated"
+    AUTOMATED = "Automated"
+    DERIVED = "Derived"
+
+
+class StateTagLabel(CaseInsensitiveEnum):
+    SUGGESTED = "Suggested"
+    CONFIRMED = "Confirmed"
 
 
 class OpenMetadataTagLabel(BaseModel):
-    tagFQN: Optional[str] = None
+    tagFQN: str
     description: Optional[str] = None
-    source: Optional[TagSourceTagLabel] = TagSourceTagLabel.CLASSIFICATION
-    labelType: Optional[LabelTypeTagLabel] = LabelTypeTagLabel.MANUAL
-    state: Optional[StateTagLabel] = StateTagLabel.CONFIRMED
+    source: TagSourceTagLabel = TagSourceTagLabel.CLASSIFICATION
+    labelType: LabelTypeTagLabel = LabelTypeTagLabel.MANUAL
+    state: StateTagLabel = StateTagLabel.CONFIRMED
     href: Optional[str] = None
 
 
-class ConnectionTypeWorkload(StrEnum):
+class ConnectionTypeWorkload(CaseInsensitiveEnum):
     HOUSEKEEPING = "HOUSEKEEPING"
     DATAPIPELINE = "DATAPIPELINE"
 
@@ -62,6 +69,8 @@ class OpenMetadataColumn(BaseModel):
     dataLength: Optional[int] = None
     precision: Optional[int] = None
     scale: Optional[int] = None
+    description: Optional[str] = None
+    tags: Optional[List[OpenMetadataTagLabel]] = None
 
     @field_validator("dataType")
     @classmethod
@@ -78,7 +87,7 @@ class OpenMetadataColumn(BaseModel):
 
 
 class DataContract(BaseModel):
-    schema_: List[OpenMetadataColumn] = Field(..., alias="schema")
+    schema_: Optional[List[OpenMetadataColumn]] = Field(..., alias="schema")
 
 
 class DataSharingAgreement(BaseModel):
@@ -89,24 +98,6 @@ class DataSharingAgreement(BaseModel):
     limitations: Optional[str] = None
     lifeCycle: Optional[str] = None
     confidentiality: Optional[str] = None
-
-
-class InputWorkload(BaseModel):
-    outputPortName: Optional[str] = None
-    systemName: Optional[str] = None
-
-    @model_validator(mode="before")
-    @classmethod
-    def check_mutual_exclusivity(cls, values):
-        field1 = values.get("outputPortName")
-        field2 = values.get("systemName")
-
-        if field1 is not None and field2 is not None:
-            raise ValueError(
-                "outputPortName and systemName are mutually exclusive, but both are provided"  # noqa: E501
-            )
-
-        return values
 
 
 class Component(BaseModel):
@@ -136,7 +127,7 @@ class OutputPort(Component):
     retentionTime: Optional[str] = None
     processDescription: Optional[str] = None
     dataContract: DataContract
-    dataSharingAgreement: DataSharingAgreement
+    dataSharingAgreement: Optional[DataSharingAgreement] = None
     tags: List[OpenMetadataTagLabel]
     sampleData: Optional[dict] = None  # OpenMetadataTable
     semanticLinking: List[dict]
@@ -165,40 +156,7 @@ class Workload(Component):
     workloadType: Optional[str] = None
     connectionType: ConnectionTypeWorkload
     tags: List[OpenMetadataTagLabel]
-    readsFrom: Optional[List[InputWorkload]] = None
-
-    def __init__(self, **data):
-        reads_from_values = data.get("readsFrom", [])
-        connection_type = data.get("connectionType")
-
-        input_workloads = []
-
-        # ReadsFrom is filled only for DataPipeline workloads
-        if (
-            connection_type != ConnectionTypeWorkload.DATAPIPELINE
-            and len(reads_from_values) > 0
-        ):
-            raise ValueError(
-                "readsFrom is only allowed when connectionType is 'DATAPIPELINE'"  # noqa: E501
-            )
-
-        # Output Ports are identified with DP_UK:$OutputPortName,
-        # while external systems will be defined by a URN in the form urn:dmb:ex:$SystemName    # noqa: E501
-        for reads_from_value in reads_from_values:
-            if reads_from_value.startswith("DP_UK:"):
-                input_workload = InputWorkload(outputPortName=reads_from_value)
-            elif reads_from_value.startswith("urn:dmb:ex:"):
-                input_workload = InputWorkload(systemName=reads_from_value)
-            else:
-                raise ValueError(
-                    f"Incorrect value in readsFrom: {reads_from_value}. "
-                    f"Value should start with DP_UK: or urn:dmb:ex:"
-                )
-
-            input_workloads.append(input_workload)
-
-        data["readsFrom"] = input_workloads
-        super().__init__(**data)
+    readsFrom: Optional[List[str]] = None
 
     @field_validator("kind")
     @classmethod
@@ -317,9 +275,7 @@ class DataProduct(BaseModel):
             >>> outputport_components = my_data_product.get_components_by_kind('outputport')
         """  # noqa: E501
 
-        new_components_list = [
-            component for component in self.components if component.kind == kind
-        ]
+        new_components_list = [component for component in self.components if component.kind == kind]
 
         return new_components_list
 
@@ -350,9 +306,7 @@ class DataProduct(BaseModel):
                 return component
         return None
 
-    def get_typed_component_by_id(
-        self, component_id: str, component_type: Type[BaseModel]
-    ):
+    def get_typed_component_by_id(self, component_id: str, component_type: Type[BaseModel]):
         component = self.get_component_by_id(component_id)
         if component is not None:
             return component_type.parse_obj(component.dict(by_alias=True))

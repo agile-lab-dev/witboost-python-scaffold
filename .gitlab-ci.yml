@@ -70,7 +70,7 @@ compliance:
   before_script:
     - python --version
     - pip install poetry liccheck
-    - cd specific-provisioner
+    - cd tech-adapter
     - poetry install
   script:
     - poetry export --without-hashes --format=requirements.txt > requirements.txt
@@ -81,7 +81,7 @@ compliance:
   artifacts:
    when: always
    paths:
-    - specific-provisioner/vulnerabilities.json
+    - tech-adapter/vulnerabilities.json
 
 linter:
   stage: test
@@ -89,7 +89,7 @@ linter:
   before_script:
     - python --version
     - pip install poetry
-    - cd specific-provisioner
+    - cd tech-adapter
     - poetry install
   script:
     - poetry run ruff check .
@@ -110,7 +110,7 @@ type_checks:
   before_script:
     - python --version
     - pip install poetry
-    - cd specific-provisioner
+    - cd tech-adapter
     - poetry install
   script:
     - poetry run mypy .
@@ -121,7 +121,7 @@ run_tests:
   before_script:
     - python --version
     - pip install poetry
-    - cd specific-provisioner
+    - cd tech-adapter
     - poetry install
   script:
     - poetry run pytest --cov=src/ tests/. --cov-report=xml
@@ -130,7 +130,7 @@ run_tests:
     reports:
       coverage_report:
         coverage_format: cobertura
-        path: specific-provisioner/coverage.xml
+        path: tech-adapter/coverage.xml
 
 poetry_build:
   stage: build
@@ -138,13 +138,13 @@ poetry_build:
   before_script:
     - python --version
     - pip install poetry
-    - cd specific-provisioner
+    - cd tech-adapter
     - poetry install
   script:
     - poetry build
   artifacts:
     paths:
-      - specific-provisioner/dist
+      - tech-adapter/dist
 
 common_build:
   stage: build
@@ -165,7 +165,7 @@ docker_build:
   services:
     - docker:23.0.0-dind
   script:
-    - cd specific-provisioner
+    - cd tech-adapter
     - export COMPOSE_DOCKER_CLI_BUILD=1
     - export DOCKER_BUILDKIT=1
     - echo VERSION=${VERSION}
@@ -184,7 +184,7 @@ push_build:
     - set +x
     - ls -al
     - echo VERSION=${VERSION}
-    - cp specific-provisioner/dist/*.whl build-${VERSION}.whl
+    - cp tech-adapter/dist/*.whl build-${VERSION}.whl
     - export NAME_WHEEL=$(basename *.whl)
     - ls -al
     - echo ${NAME_WHEEL}
@@ -204,7 +204,7 @@ container_scanning:
   stage: build
   variables:
     GIT_STRATEGY: fetch
-    CS_DOCKERFILE_PATH: specific-provisioner/
+    CS_DOCKERFILE_PATH: tech-adapter/
     CS_IMAGE: $CI_REGISTRY_IMAGE:$VERSION
   script:
     - 'echo Version: $VERSION'

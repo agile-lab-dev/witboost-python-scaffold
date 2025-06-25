@@ -10,10 +10,7 @@ from src.models.api_models import (
     ValidationError,
 )
 from src.models.data_product_descriptor import DataProduct
-from src.utility.logger import get_logger
 from src.utility.parsing_pydantic_models import parse_yaml_with_model
-
-logger = get_logger()
 
 
 async def unpack_provisioning_request(
@@ -50,9 +47,7 @@ async def unpack_provisioning_request(
         return ValidationError(errors=[error])
     try:
         descriptor_dict = yaml.safe_load(provisioning_request.descriptor)
-        data_product = parse_yaml_with_model(
-            descriptor_dict.get("dataProduct"), DataProduct
-        )
+        data_product = parse_yaml_with_model(descriptor_dict.get("dataProduct"), DataProduct)
         component_to_provision = descriptor_dict.get("componentIdToProvision")
 
         if isinstance(data_product, DataProduct):
@@ -104,11 +99,7 @@ async def unpack_unprovisioning_request(
     """  # noqa: E501
 
     unpacked_request = await unpack_provisioning_request(provisioning_request)
-    remove_data = (
-        provisioning_request.removeData
-        if provisioning_request.removeData is not None
-        else False
-    )
+    remove_data = provisioning_request.removeData if provisioning_request.removeData is not None else False
 
     if isinstance(unpacked_request, ValidationError):
         return unpacked_request
@@ -164,11 +155,7 @@ async def unpack_update_acl_request(
         elif isinstance(data_product, ValidationError):
             return data_product
         else:
-            return ValidationError(
-                errors=[
-                    "An unexpected error occurred while parsing the update acl request."
-                ]
-            )
+            return ValidationError(errors=["An unexpected error occurred while parsing the update acl request."])
     except Exception as ex:
         return ValidationError(errors=["Unable to parse the descriptor.", str(ex)])
 

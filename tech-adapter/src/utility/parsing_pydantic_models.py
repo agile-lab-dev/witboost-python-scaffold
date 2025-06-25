@@ -1,13 +1,11 @@
 from typing import Type, TypeVar
 
+import pydantic
 import yaml
+from loguru import logger
 from pydantic import BaseModel
 
 from src.models.api_models import ValidationError
-from src.utility.logger import get_logger
-
-logger = get_logger()
-
 
 T = TypeVar("T", bound=BaseModel)
 
@@ -63,14 +61,19 @@ def parse_yaml_with_model(yaml_data: dict | str, model: Type[T]) -> T | Validati
 
         data = model(**yaml_dict)
         return data
-    except ValueError as e:
-        logger.error(f"Validation error: {e}")
-        return ValidationError(
-            errors=[
-                f"An error occurred parsing the yaml data with {model} type. \n"
-                f"Exception: {e}"
-            ]
-        )
+    except pydantic.ValidationError as ve:
+        error_msg = "Failed to parse the descriptor. Details: \n"
+        logger.exception(error_msg)
+        combined = [
+            error_msg
+            + " , \n".join(
+                map(
+                    str,
+                    ve.errors(include_url=False, include_context=False, include_input=False),
+                )
+            )
+        ]
+        return ValidationError(errors=combined)
     except Exception as e:
-        logger.error(f"Unexpected error: {e}")
+        logger.exception("Unexpected error")
         raise e

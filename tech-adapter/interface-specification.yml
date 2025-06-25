@@ -1,6 +1,6 @@
 openapi: 3.0.3
 info:
-  title: Specific Provisioner Micro Service
+  title: Tech Adapter Micro Service
   description: "Microservice responsible to handle provisioning and access control requests for one or more data product components."
   version: "{{version}}"
 servers:
@@ -219,7 +219,7 @@ paths:
     post:
       tags:
         - SpecificProvisioner
-      summary: Request the access to a specific provisioner component
+      summary: Request the access to a tech adapter component
       operationId: updateacl
       requestBody:
         description: An access request object. The provisoning info reported in `provisionInfo` refer to the latest complete provisioning workflow of the target component

@@ -3,15 +3,14 @@ import json
 from typing import Any
 
 from fastapi import FastAPI
+from fastapi.encoders import jsonable_encoder
 from fastapi.routing import APIRoute
+from loguru import logger
 from pydantic import BaseModel
 from starlette.responses import Response
 
 from src.app_config import app
 from src.models.api_models import SystemErr
-from src.utility.logger import get_logger
-
-logger = get_logger()
 
 
 def check_response(
@@ -47,9 +46,7 @@ def check_response(
         return _check_response_type(responses, out_response)
 
     if route_path is not None:
-        endpoint = _find_caller_endpoint_by_path(
-            application=application, caller_path=route_path
-        )
+        endpoint = _find_caller_endpoint_by_path(application=application, caller_path=route_path)
 
     else:
         caller_function = _find_caller_function()
@@ -65,9 +62,7 @@ def check_response(
                 media_type="application/json",
             )
 
-        endpoint = _find_caller_endpoint_by_name(
-            application=application, caller_name=caller_function
-        )
+        endpoint = _find_caller_endpoint_by_name(application=application, caller_name=caller_function)
 
     responses = endpoint.responses if endpoint is not None else None
 
@@ -127,11 +122,9 @@ def _check_response_type(responses: dict, out_response: Any) -> Response:
         )
 
     if isinstance(out_response, BaseModel):
-        content = json.dumps(out_response.model_dump())
+        content = json.dumps(jsonable_encoder(out_response))
         media_type = "application/json"
-    elif isinstance(out_response, list) and all(
-        isinstance(item, BaseModel) for item in out_response
-    ):  # noqa: E501
+    elif isinstance(out_response, list) and all(isinstance(item, BaseModel) for item in out_response):  # noqa: E501
         out_response_dicts = [item.dict() for item in out_response]
         content = json.dumps(out_response_dicts)
         media_type = "application/json"
@@ -139,9 +132,7 @@ def _check_response_type(responses: dict, out_response: Any) -> Response:
         content = str(out_response)
         media_type = "text/plain"
 
-    return Response(
-        status_code=int(response_code), content=content, media_type=media_type
-    )
+    return Response(status_code=int(response_code), content=content, media_type=media_type)
 
 
 def _find_caller_function(n_back: int = 2) -> str | None:
@@ -174,9 +165,7 @@ def _find_caller_function(n_back: int = 2) -> str | None:
     return caller_function
 
 
-def _find_caller_endpoint_by_path(
-    application: FastAPI, caller_path: str
-) -> APIRoute | None:
+def _find_caller_endpoint_by_path(application: FastAPI, caller_path: str) -> APIRoute | None:
     """
     Find and return the FastAPI endpoint (APIRoute) based on the provided caller_path.
 
@@ -201,9 +190,7 @@ def _find_caller_endpoint_by_path(
     return None
 
 
-def _find_caller_endpoint_by_name(
-    application: FastAPI, caller_name: str
-) -> APIRoute | None:
+def _find_caller_endpoint_by_name(application: FastAPI, caller_name: str) -> APIRoute | None:
     """
     Find and return the FastAPI endpoint (APIRoute) based on the provided caller_name.
 

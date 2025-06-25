@@ -5,14 +5,12 @@ import pydantic_core
 import pytest
 import yaml
 
-from src.models.api_models import ValidationError
 from src.models.data_product_descriptor import (
     ComponentKind,
     ConnectionTypeWorkload,
     DataContract,
     DataProduct,
     DataSharingAgreement,
-    InputWorkload,
     Observability,
     OpenMetadataColumn,
     OutputPort,
@@ -51,12 +49,8 @@ class TestDataProductDescriptor(unittest.TestCase):
                     version="1.0",
                     infrastructureTemplateId="infra1",
                     outputPortType="Type1",
-                    dependsOn=[
-                        "op2"
-                    ],  # Depends on another output port within the same Data Product
-                    dataContract=DataContract(
-                        schema=[column1, column2]
-                    ),  # Provide valid schema instances
+                    dependsOn=["op2"],  # Depends on another output port within the same Data Product
+                    dataContract=DataContract(schema=[column1, column2]),  # Provide valid schema instances
                     dataSharingAgreement=DataSharingAgreement(),
                     tags=[],
                     semanticLinking=[],
@@ -118,30 +112,22 @@ class TestDataProductDescriptor(unittest.TestCase):
         )
 
     def test_get_components_by_kind_outputport(self):
-        output_ports = self.sample_data_product.get_components_by_kind(
-            ComponentKind.OUTPUTPORT
-        )
+        output_ports = self.sample_data_product.get_components_by_kind(ComponentKind.OUTPUTPORT)
         self.assertEqual(2, len(output_ports))
         self.assertIsInstance(output_ports[0], OutputPort)
 
     def test_get_components_by_kind_workload(self):
-        workloads = self.sample_data_product.get_components_by_kind(
-            ComponentKind.WORKLOAD
-        )
+        workloads = self.sample_data_product.get_components_by_kind(ComponentKind.WORKLOAD)
         self.assertEqual(1, len(workloads))
         self.assertIsInstance(workloads[0], Workload)
 
     def test_get_components_by_kind_storage(self):
-        storage_areas = self.sample_data_product.get_components_by_kind(
-            ComponentKind.STORAGE
-        )
+        storage_areas = self.sample_data_product.get_components_by_kind(ComponentKind.STORAGE)
         self.assertEqual(1, len(storage_areas))
         self.assertIsInstance(storage_areas[0], StorageArea)
 
     def test_get_components_by_kind_observability(self):
-        observability_apis = self.sample_data_product.get_components_by_kind(
-            ComponentKind.OBSERVABILITY
-        )
+        observability_apis = self.sample_data_product.get_components_by_kind(ComponentKind.OBSERVABILITY)
         self.assertEqual(1, len(observability_apis))
         self.assertIsInstance(observability_apis[0], Observability)
 
@@ -157,9 +143,7 @@ class TestDataProductDescriptor(unittest.TestCase):
         self.assertIsNone(component)
 
     def test_get_components_by_kind_outputport_with_dependencies(self):
-        output_ports = self.sample_data_product.get_components_by_kind(
-            ComponentKind.OUTPUTPORT
-        )
+        output_ports = self.sample_data_product.get_components_by_kind(ComponentKind.OUTPUTPORT)
         self.assertEqual(2, len(output_ports))
         self.assertIsInstance(output_ports[0], OutputPort)
         self.assertIsInstance(output_ports[1], OutputPort)
@@ -202,9 +186,7 @@ class TestDataProductDescriptor(unittest.TestCase):
 
         valid_output_port_data = yaml.safe_load(valid_output_port_data)
 
-        OutputPort.check_kind(
-            ComponentKind.OUTPUTPORT, valid_output_port_data
-        )  # Should not raise an error
+        OutputPort.check_kind(ComponentKind.OUTPUTPORT, valid_output_port_data)  # Should not raise an error
 
         invalid_output_port_data = """
             id: output_port_2
@@ -228,9 +210,7 @@ class TestDataProductDescriptor(unittest.TestCase):
         """
 
         valid_workload_data = yaml.safe_load(valid_workload_data)
-        Workload.check_kind(
-            ComponentKind.WORKLOAD, valid_workload_data
-        )  # Should not raise an error
+        Workload.check_kind(ComponentKind.WORKLOAD, valid_workload_data)  # Should not raise an error
 
         invalid_workload_data = """
           id: workload_2
@@ -254,9 +234,7 @@ class TestDataProductDescriptor(unittest.TestCase):
         """
 
         valid_storage_area_data = yaml.safe_load(valid_storage_area_data)
-        StorageArea.check_kind(
-            ComponentKind.STORAGE, valid_storage_area_data
-        )  # Should not raise an error
+        StorageArea.check_kind(ComponentKind.STORAGE, valid_storage_area_data)  # Should not raise an error
 
         invalid_storage_area_data = """
             id: storage_2
@@ -281,9 +259,7 @@ class TestDataProductDescriptor(unittest.TestCase):
         """
 
         valid_observability_data = yaml.safe_load(valid_observability_data)
-        Observability.check_kind(
-            ComponentKind.OBSERVABILITY, valid_observability_data
-        )  # Should not raise an error
+        Observability.check_kind(ComponentKind.OBSERVABILITY, valid_observability_data)  # Should not raise an error
 
         invalid_observability_data = """
         id: observability_2
@@ -298,39 +274,6 @@ class TestDataProductDescriptor(unittest.TestCase):
         with pytest.raises(ValueError):
             Observability.check_kind(ComponentKind.WORKLOAD, invalid_observability_data)
 
-    def test_input_workload_check_mutual_exclusivity_classmethod(self):
-        valid_input_workload_data = """
-        outputPortName: Output1
-        systemName:
-        """
-
-        valid_input_workload_data = yaml.safe_load(valid_input_workload_data)
-
-        InputWorkload.check_mutual_exclusivity(
-            valid_input_workload_data
-        )  # Should not raise an error
-
-        valid_input_workload_data = """
-        outputPortName:
-        systemName: System1
-        """
-
-        valid_input_workload_data = yaml.safe_load(valid_input_workload_data)
-
-        InputWorkload.check_mutual_exclusivity(
-            valid_input_workload_data
-        )  # Should not raise an error
-
-        invalid_input_workload_data = """
-        outputPortName: Output1
-        systemName: System1
-        """
-
-        invalid_input_workload_data = yaml.safe_load(invalid_input_workload_data)
-
-        with pytest.raises(ValueError):
-            InputWorkload.check_mutual_exclusivity(invalid_input_workload_data)
-
     def test_open_metadata_column_check_dataType_classmethod(self):
         valid_column_data = """
         name: column1
@@ -339,9 +282,7 @@ class TestDataProductDescriptor(unittest.TestCase):
 
         valid_column_data = yaml.safe_load(valid_column_data)
 
-        OpenMetadataColumn.check_dataType(
-            "string", valid_column_data
-        )  # Should not raise an error
+        OpenMetadataColumn.check_dataType("string", valid_column_data)  # Should not raise an error
 
         invalid_column_data = """
         name: column2
@@ -353,70 +294,6 @@ class TestDataProductDescriptor(unittest.TestCase):
 
         with pytest.raises(ValueError):
             OpenMetadataColumn.check_dataType("invalid_type", invalid_column_data)
-
-    def test_workload_correct_readsFrom(self):
-        input_data = """
-          id: "123"
-          name: "Workload1"
-          fullyQualifiedName: "example.Workload1"
-          description: "Description"
-          specific:
-            version: "1.0"
-          kind: "workload"
-          version: "1.0"
-          infrastructureTemplateId: "template1"
-          dependsOn:
-            - "dependency1"
-            - "dependency2"
-          readsFrom:
-            - "DP_UK:123"
-            - "urn:dmb:ex:456"
-            - "DP_UK:789"
-            - "urn:dmb:ex:101112"
-          connectionType: "DATAPIPELINE"
-          tags: []
-        """
-
-        workload = parse_yaml_with_model(input_data, Workload)
-
-        self.assertEqual(workload.id, "123")
-        self.assertEqual(workload.name, "Workload1")
-        self.assertEqual(workload.fullyQualifiedName, "example.Workload1")
-        self.assertEqual(workload.description, "Description")
-        self.assertEqual(workload.specific, {"version": "1.0"})
-        self.assertEqual(workload.kind, ComponentKind.WORKLOAD)
-
-        self.assertEqual(len(workload.readsFrom), 4)
-        self.assertEqual(workload.readsFrom[0].outputPortName, "DP_UK:123")
-        self.assertEqual(workload.readsFrom[1].systemName, "urn:dmb:ex:456")
-        self.assertEqual(workload.readsFrom[2].outputPortName, "DP_UK:789")
-        self.assertEqual(workload.readsFrom[3].systemName, "urn:dmb:ex:101112")
-
-    def test_workload_incorrect_readsFrom(self):
-        input_data = """
-          id: "123"
-          name: "Workload1"
-          fullyQualifiedName: "example.Workload1"
-          description: "Description"
-          specific:
-            version: "1.0"
-          kind: "workload"
-          version: "1.0"
-          infrastructureTemplateId: "template1"
-          dependsOn:
-            - "dependency1"
-            - "dependency2"
-          readsFrom:
-            - "ERROR_UK:123"
-            - "urn:dmb:ex:456"
-            - "DP_UK:789"
-            - "urn:dmb:ex:101112"
-          connectionType: "DATAPIPELINE"
-          tags: []
-        """
-        result = parse_yaml_with_model(input_data, Workload)
-        assert isinstance(result, ValidationError)
-        self.assertIn("Incorrect value in readsFrom:", result.errors[0])
 
     def test_workload_without_readsFrom(self):
         input_data = """
@@ -439,36 +316,6 @@ class TestDataProductDescriptor(unittest.TestCase):
         result = parse_yaml_with_model(input_data, Workload)
         assert isinstance(result, Workload)
 
-    def test_workload_readsFrom_invalid_connectionType(self):
-        input_data = """
-            id: "123"
-            name: "Workload1"
-            fullyQualifiedName: "example.Workload1"
-            description: "Description"
-            specific:
-            version: "1.0"
-            kind: "workload"
-            version: "1.0"
-            infrastructureTemplateId: "template1"
-            dependsOn:
-            - "dependency1"
-            - "dependency2"
-            readsFrom:
-            - "DP_UK:123"
-            - "urn:dmb:ex:456"
-            - "DP_UK:789"
-            - "urn:dmb:ex:101112"
-            connectionType: "housekeeping"
-            tags: []
-            """
-
-        result = parse_yaml_with_model(input_data, Workload)
-        assert isinstance(result, ValidationError)
-        self.assertIn(
-            "readsFrom is only allowed when connectionType is 'DATAPIPELINE'",
-            result.errors[0],
-        )
-
     def test_get_typed_component_output_port(self):
         descriptor_str = Path("tests/descriptors/descriptor_output_port_valid.yaml").read_text()
         request = yaml.safe_load(descriptor_str)
@@ -482,5 +329,5 @@ class TestDataProductDescriptor(unittest.TestCase):
         data_product = parse_yaml_with_model(request.get("dataProduct"), DataProduct)
         invalid_component_to_provision = request.get("componentIdToProvision")
 
-        with pytest.raises(pydantic_core.ValidationError, match="5 validation errors for OutputPort"):
+        with pytest.raises(pydantic_core.ValidationError, match="4 validation errors for OutputPort"):
             data_product.get_typed_component_by_id(invalid_component_to_provision, OutputPort)

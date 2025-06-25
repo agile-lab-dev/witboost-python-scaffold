@@ -98,7 +98,7 @@ dataProduct:
             dataLength: 16777216
             tags:
               - tagFQN: PII
-                source: Tag
+                source: Classification
                 labelType: Manual
                 state: Confirmed
           - name: new_persons_vaccinated
@@ -146,4 +146,4 @@ dataProduct:
           analytical use cases.
         lifeCycle: Data loaded every two days and typically never deleted.
         confidentiality: None.
-componentIdToProvision: urn:dmb:cmp:healthcare:vaccinations:0:snowflake-storage
+componentIdToProvision: urn:dmb:cmp:healthcare:vaccinations:0:snowflake-output-port

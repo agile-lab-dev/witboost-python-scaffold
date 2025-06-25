@@ -90,26 +90,20 @@ class TestCheckResponses(unittest.TestCase):
         # Test a valid response for status code 200
         out_response = 1
         responses = {"200": {"model": int}}
-        response = check_response(
-            application=app2, out_response=out_response, responses=responses
-        )
+        response = check_response(application=app2, out_response=out_response, responses=responses)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(json.loads(response.body), 1)
 
     def test_check_responses_invalid_response(self):
         out_response = 1
         responses = None
-        response = check_response(
-            application=app2, out_response=out_response, responses=responses
-        )
+        response = check_response(application=app2, out_response=out_response, responses=responses)
         self.assertEqual(response.status_code, 500)
         self.assertIn("error", json.loads(response.body))
 
     def test_check_responses_invalid_response2(self):
         out_response = "ciao"
         responses = {"200": {"model": int}}
-        response = check_response(
-            application=app2, out_response=out_response, responses=responses
-        )
+        response = check_response(application=app2, out_response=out_response, responses=responses)
         self.assertEqual(response.status_code, 500)
         self.assertIn("error", json.loads(response.body))

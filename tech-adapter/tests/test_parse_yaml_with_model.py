@@ -94,9 +94,7 @@ def test_parse_valid_data_product_yaml():
 def test_parse_invalid_data_product_yaml():
     descriptor_str = Path("tests/descriptors/data_product_valid.yaml").read_text()
     # Modify the YAML data to make it invalid
-    invalid_yaml_data = descriptor_str.replace(
-        "name: Vaccinations", "invalid_field: Invalid Value"
-    )
+    invalid_yaml_data = descriptor_str.replace("name: Vaccinations", "invalid_field: Invalid Value")
 
     result = parse_yaml_with_model(invalid_yaml_data, DataProduct)
     assert isinstance(result, ValidationError)

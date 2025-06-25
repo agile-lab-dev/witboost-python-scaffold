@@ -2,10 +2,10 @@ import os
 import subprocess
 
 # Specification path
-INPUT_SPEC = "specific-provisioner/interface-specification.yml"
+INPUT_SPEC = "tech-adapter/interface-specification.yml"
 
 # Code output path
-PATH_FOLDER = "specific-provisioner/src/"
+PATH_FOLDER = "tech-adapter/src/"
 
 # Path of the main program related to the API
 PATH_MAIN = f"{PATH_FOLDER}/main.py"
@@ -31,7 +31,7 @@ print("_________________________________________________________________________
 # Install pre-commit hooks
 print("Installing 'pre-commit'.......")
 cwd1 = os.getcwd()
-os.chdir(f"{cwd1}/specific-provisioner")
+os.chdir(f"{cwd1}/tech-adapter")
 subprocess.run(["pre-commit", "install"], check=True)
 
 print("______________________________________________________________________________\n")

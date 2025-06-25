@@ -2,20 +2,20 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: {{ template "pythonsp.name" . }}
-{{- include "pythonsp.labels" . | nindent 4 }}
-  name: {{ template "pythonsp.fullname" . }}
+    app: {{ template "pythonta.name" . }}
+{{- include "pythonta.labels" . | nindent 4 }}
+  name: {{ template "pythonta.fullname" . }}
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: {{ template "pythonsp.name" . }}
+      app: {{ template "pythonta.name" . }}
   template:
     metadata:
       annotations:
       labels:
-        app: {{ template "pythonsp.name" . }}
-{{- include "pythonsp.labels" . | nindent 8 }}
+        app: {{ template "pythonta.name" . }}
+{{- include "pythonta.labels" . | nindent 8 }}
     spec:
       automountServiceAccountToken: false
       {{- if .Values.dockerRegistrySecretName }}

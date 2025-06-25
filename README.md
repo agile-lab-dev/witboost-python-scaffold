@@ -13,19 +13,19 @@ This repository is part of our [Starter Kit](https://github.com/agile-lab-dev/wi
 - [Overview](#overview)
 - [Building](#building)
 - [Running](#running)
-- [OpenTelemetry Setup](specific-provisioner/docs/opentelemetry.md)
+- [OpenTelemetry Setup](tech-adapter/docs/opentelemetry.md)
 - [Deploying](#deploying)
 - [API specification](docs/API.md)
 
 ## Overview
 
-This project provides a scaffold to develop a Specific Provisioner from scratch using Python & FastAPI.
+This project provides a scaffold to develop a Tech Adapter from scratch using Python & FastAPI.
 
-### What's a Specific Provisioner?
+### What's a Tech Adapter?
 
-A Specific Provisioner is a microservice which is in charge of deploying components that use a specific technology. When the deployment of a Data Product is triggered, the platform generates it descriptor and orchestrates the deployment of every component contained in the Data Product. For every such component the platform knows which Specific Provisioner is responsible for its deployment, and can thus send a provisioning request with the descriptor to it so that the Specific Provisioner can perform whatever operation is required to fulfill this request and report back the outcome to the platform.
+A Tech Adapter is a microservice which is in charge of deploying components that use a specific technology. When the deployment of a Data Product is triggered, the platform generates it descriptor and orchestrates the deployment of every component contained in the Data Product. For every such component the platform knows which Tech Adapter is responsible for its deployment, and can thus send a provisioning request with the descriptor to it so that the Tech Adapter can perform whatever operation is required to fulfill this request and report back the outcome to the platform.
 
-You can learn more about how the Specific Provisioners fit in the broader picture [here](https://docs.witboost.agilelab.it/docs/p2_arch/p1_intro/#deploy-flow).
+You can learn more about how the Tech Adapters fit in the broader picture [here](https://docs.witboost.agilelab.it/docs/p2_arch/p1_intro/#deploy-flow).
 
 ### Software stack
 
@@ -54,7 +54,7 @@ If you do have Python 3 installed, but not version 3.11 required by this project
 
 ```shell
 pyenv install 3.11
-cd specific-provisioner
+cd tech-adapter
 pyenv local 3.11
 ```
 
@@ -74,10 +74,10 @@ poetry --version
 
 If you see something like `Poetry (version x.x.x)`, your installation is ready to use!
 
-Install the dependencies defined in `specific-provisioner/pyproject.toml`:
+Install the dependencies defined in `tech-adapter/pyproject.toml`:
 
 ```shell
-cd specific-provisioner
+cd tech-adapter
 poetry env use 3.11
 poetry install
 ```
@@ -108,7 +108,7 @@ The Docker image can be built with:
 docker build .
 ```
 
-More details can be found [here](specific-provisioner/docs/docker.md).
+More details can be found [here](tech-adapter/docs/docker.md).
 
 _Note:_ the version for the project is automatically computed using information gathered from Git, using branch name and tags. Unless you are on a release branch `1.2.x` or a tag `v1.2.3` it will end up being `0.0.0`. You can follow this branch/tag convention or update the version computation to match your preferred strategy.
 
@@ -119,7 +119,7 @@ _Note:_ the version for the project is automatically computed using information 
 To run the server locally, use:
 
 ```bash
-cd specific-provisioner
+cd tech-adapter
 source $(poetry env info --path)/bin/activate # only needed if venv is not already enabled
 uvicorn src.main:app --host 127.0.0.1 --port 8091
 ```

@@ -63,9 +63,7 @@ def test_unprovisioning_valid_descriptor():
 
 
 def test_validate_invalid_descriptor():
-    validate_request = ProvisioningRequest(
-        descriptorKind=DescriptorKind.COMPONENT_DESCRIPTOR, descriptor="descriptor"
-    )
+    validate_request = ProvisioningRequest(descriptorKind=DescriptorKind.COMPONENT_DESCRIPTOR, descriptor="descriptor")
 
     resp = client.post("/v1/validate", json=dict(validate_request))
 
