@@ -49,6 +49,6 @@ spec:
                 fieldRef:
                   fieldPath: metadata.namespace
             {{- if .Values.extraEnvVars }}
-            {{- include "pythonta.tplvalues.render" (dict "value" .Values.extraEnvVars "context" $) | nindent 12 }}
+            {{- include "common.tplvalues.render" (dict "value" .Values.extraEnvVars "context" $) | nindent 12 }}
             {{- end }}
           volumeMounts:
