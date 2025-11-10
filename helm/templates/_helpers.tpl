@@ -50,3 +50,15 @@ helm.sh/chart: {{ include "pythonta.chart" . }}
 {{- end }}
 {{- end -}}
 
+{{/*
+Render a value that may contain templating, similar to Bitnami common.tplvalues.render
+Usage:
+{{ include "pythonta.tplvalues.render" ( dict "value" .Values.path.to.the.Value "context" $) }}
+*/}}
+{{- define "pythonta.tplvalues.render" -}}
+    {{- if typeIs "string" .value }}
+        {{- tpl .value .context }}
+    {{- else }}
+        {{- tpl (.value | toYaml) .context }}
+    {{- end }}
+{{- end -}}
